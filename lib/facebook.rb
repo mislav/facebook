@@ -38,7 +38,7 @@ module Facebook
       if code = request[:code]
         access_token = @client.get_access_token(code, callback_url)
         request.session[:facebook_access_token] = access_token.token
-        request.session[:facebook_user] = Yajl.parse(access_token.get('/me'))
+        request.session[:facebook_user] = Yajl::Parser.parse(access_token.get('/me'))
         redirect_to_return_path
       else
         redirect @client.authorize_url(:redirect_uri => callback_url)

@@ -1,6 +1,7 @@
 require 'oauth2'
 require 'yajl'
 require 'rack/request'
+require 'addressable/uri'
 
 module Facebook
   class Client
@@ -33,13 +34,14 @@ module Facebook
     
     def call(env)
       request = Request.new(env)
-      callback_url = request.url
+      callback_url = Addressable::URI.parse(request.url)
+      callback_url.query = nil
       
       if code = request[:code]
         access_token = @client.get_access_token(code, callback_url)
         request.session[:facebook_access_token] = access_token.token
         request.session[:facebook_user] = Yajl::Parser.parse(access_token.get('/me'))
-        redirect_to_return_path
+        redirect_to_return_path(request)
       else
         redirect @client.authorize_url(:redirect_uri => callback_url)
       end

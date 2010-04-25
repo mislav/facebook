@@ -24,5 +24,8 @@ Gem::Specification.new do |gem|
   gem.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
 
   gem.files = Dir['Rakefile', '{bin,lib,man,test,spec}/**/*', 'README*', 'LICENSE*']
-  gem.files &= versioned if versioned = `git ls-files -z 2>/dev/null`.split("\0") and $?.success?
+
+  if versioned = `git ls-files -z 2>/dev/null`.split("\0") and $?.success?
+    gem.files &= versioned
+  end
 end

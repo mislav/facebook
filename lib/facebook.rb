@@ -9,34 +9,34 @@ module Facebook
       @oauth = OAuth2::Client.new(app_id, secret, :site => 'https://graph.facebook.com')
       @default_params = { :scope => options[:permissions], :display => options[:display] }
     end
-    
+
     # params: redirect_uri, scope, display
     def authorize_url(params = {})
       @oauth.web_server.authorize_url(@default_params.merge(params))
     end
-    
+
     def get_access_token(code, redirect_uri)
       @oauth.web_server.get_access_token(code, :redirect_uri => redirect_uri)
     end
-    
+
     def login_handler(options = {})
       Login.new(self, options)
     end
   end
-  
+
   class Login
     attr_reader :options
-    
+
     def initialize(client, options = {})
       @client = client
       @options = { :return_to => '/' }.merge(options)
     end
-    
+
     def call(env)
       request = Request.new(env)
       callback_url = Addressable::URI.parse(request.url)
       callback_url.query = nil
-      
+
       if code = request[:code]
         access_token = @client.get_access_token(code, callback_url)
         request.session[:facebook_access_token] = access_token.token
@@ -61,7 +61,7 @@ module Facebook
         end
       end
     end
-    
+
     class Request < ::Rack::Request
       # for storing :request_token, :access_token
       def session
@@ -80,9 +80,9 @@ module Facebook
         url << path
       end
     end
-    
+
     private
-    
+
     def redirect_to_return_path(request)
       redirect request.url_for(options[:return_to])
     end

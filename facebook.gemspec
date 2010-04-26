@@ -9,6 +9,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'yajl-ruby', '~> 0.7.5'
   gem.add_dependency 'rack', '~> 1.1.0'
   gem.add_dependency 'addressable', '~> 2.1.2'
+  gem.add_dependency 'hashie', '~> 0.2.0'
   # gem.add_development_dependency 'rspec', '~> 1.2.9'
 
   gem.summary = "REST library + Rack middleware for the Facebook Graph API"

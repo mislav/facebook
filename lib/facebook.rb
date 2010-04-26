@@ -46,6 +46,21 @@ module Facebook
         redirect @client.authorize_url(:redirect_uri => callback_url)
       end
     end
+
+    module Helpers
+      def facebook_user
+        if session[:facebook_user]
+          Hashie::Mash.new session[:facebook_user]
+        end
+      end
+
+      def facebook_logout
+        [:facebook_user, :facebook_access_token].each do |key|
+          session[key] = nil # work around Rails 2.3.5 bug
+          session.delete key
+        end
+      end
+    end
     
     class Request < ::Rack::Request
       # for storing :request_token, :access_token

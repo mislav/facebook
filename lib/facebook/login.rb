@@ -1,29 +1,9 @@
-require 'oauth2'
+require 'facebook/client'
 require 'yajl'
 require 'rack/request'
 require 'addressable/uri'
 
 module Facebook
-  class Client
-    def initialize(app_id, secret, options = {})
-      @oauth = OAuth2::Client.new(app_id, secret, :site => 'https://graph.facebook.com')
-      @default_params = { :scope => options[:permissions], :display => options[:display] }
-    end
-
-    # params: redirect_uri, scope, display
-    def authorize_url(params = {})
-      @oauth.web_server.authorize_url(@default_params.merge(params))
-    end
-
-    def get_access_token(code, redirect_uri)
-      @oauth.web_server.get_access_token(code, :redirect_uri => redirect_uri)
-    end
-
-    def login_handler(options = {})
-      Login.new(self, options)
-    end
-  end
-
   class Login
     attr_reader :options
 
@@ -38,16 +18,23 @@ module Facebook
       callback_url.query = nil
 
       if code = request[:code]
-        access_token = @client.get_access_token(code, callback_url)
-        request.session[:facebook_access_token] = access_token.token
-        request.session[:facebook_user] = Yajl::Parser.parse(access_token.get('/me'))
-        redirect_to_return_path(request)
+        handle_facebook_authorization(code, callback_url, request)
+      elsif error = request[:error_reason]
+        handle_error(error, request)
       else
-        redirect @client.authorize_url(:redirect_uri => callback_url)
+        redirect_to_facebook(callback_url)
       end
     end
 
     module Helpers
+      def facebook_client
+        facebook_oauth.restore_access_token session[:facebook_access_token]
+      end
+      
+      def facebook_oauth
+        Facebook::Client.oauth_client
+      end
+      
       def facebook_user
         if session[:facebook_user]
           Hashie::Mash.new session[:facebook_user]
@@ -82,6 +69,24 @@ module Facebook
     end
 
     private
+    
+    def handle_facebook_authorization(code, callback_url, request)
+      access_token = @client.get_access_token(code, callback_url)
+      user_info = @client.get_user_info(access_token, '/me')
+    
+      request.session[:facebook_access_token] = access_token.token
+      request.session[:facebook_user] = Yajl::Parser.parse(user_info)
+      redirect_to_return_path(request)
+    end    
+    
+    def handle_error(error, request)
+      request.session[:facebook_error] = error
+      redirect_to_return_path(request)
+    end
+    
+    def redirect_to_facebook(callback_url)
+      redirect @client.authorize_url(:redirect_uri => callback_url)
+    end
 
     def redirect_to_return_path(request)
       redirect request.url_for(options[:return_to])

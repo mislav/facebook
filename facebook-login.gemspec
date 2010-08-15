@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name    = 'facebook-login'
-  gem.version = '0.2.0'
+  gem.version = '0.2.1'
   gem.date    = Time.now.strftime('%Y-%m-%d')
 
   gem.add_dependency 'oauth2', '>= 0.0.6'

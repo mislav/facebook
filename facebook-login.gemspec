@@ -1,13 +1,13 @@
 # encoding: utf-8
 
 Gem::Specification.new do |gem|
-  gem.name    = 'facebook'
-  gem.version = '0.1.0'
-  gem.date    = Date.today.to_s
+  gem.name    = 'facebook-login'
+  gem.version = '0.2.0'
+  gem.date    = Time.now.strftime('%Y-%m-%d')
 
   gem.add_dependency 'oauth2', '>= 0.0.6'
   gem.add_dependency 'yajl-ruby', '~> 0.7.5'
-  gem.add_dependency 'rack', '~> 1.1.0'
+  gem.add_dependency 'rack', '~> 1.2.1'
   gem.add_dependency 'addressable', '~> 2.1.2'
   gem.add_dependency 'hashie', '~> 0.2.0'
   # gem.add_development_dependency 'rspec', '~> 1.2.9'
@@ -20,9 +20,9 @@ Gem::Specification.new do |gem|
   gem.homepage = 'http://github.com/mislav/facebook'
 
   gem.rubyforge_project = nil
-  gem.has_rdoc = true
-  gem.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
-  gem.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
+  gem.has_rdoc = false
+  # gem.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
+  # gem.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
 
   gem.files = Dir['Rakefile', '{bin,lib,man,test,spec}/**/*', 'README*', 'LICENSE*']
 

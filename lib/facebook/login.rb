@@ -28,7 +28,7 @@ module Facebook
 
     module Helpers
       def facebook_client
-        facebook_oauth.restore_access_token session[:facebook_access_token]
+        OAuth2::AccessToken.new(facebook_oauth, session[:facebook_access_token])
       end
       
       def facebook_oauth

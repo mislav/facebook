@@ -1,5 +1,4 @@
 require 'facebook/client'
-require 'yajl'
 require 'rack/request'
 require 'addressable/uri'
 
@@ -28,11 +27,11 @@ module Facebook
 
     module Helpers
       def facebook_client
-        OAuth2::AccessToken.new(facebook_oauth, session[:facebook_access_token])
+        Facebook::Client.restore_access_token session[:facebook_access_token]
       end
       
       def facebook_oauth
-        Facebook::Client.oauth_client
+        Facebook::Client.last_oauth_client
       end
       
       def facebook_user
@@ -71,13 +70,14 @@ module Facebook
     private
     
     def handle_facebook_authorization(code, callback_url, request)
+      require 'json' unless defined? ::JSON
       access_token = @client.get_access_token(code, callback_url)
       user_info = @client.get_user_info(access_token, '/me')
-    
+
       request.session[:facebook_access_token] = access_token.token
-      request.session[:facebook_user] = Yajl::Parser.parse(user_info)
+      request.session[:facebook_user] = JSON.parse(user_info.body)
       redirect_to_return_path(request)
-    end    
+    end
     
     def handle_error(error, request)
       request.session[:facebook_error] = error

@@ -46,7 +46,7 @@ module Facebook
     end
 
     def get_user_info(access_token, path)
-      access_token.get(path, :fields => @user_fields.join(','))
+      access_token.get(path, :params => {:fields => @user_fields.join(',')})
     end
   end
 end
